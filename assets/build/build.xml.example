@@ -3,15 +3,12 @@
 	<property file="build.properties"/>
 	<property name="Flex.ADL" value="${FLEX_HOME}\bin\adl.exe"/>
 	<property name="Flex.ADT" value="${FLEX_HOME}\lib\adt.jar"/>
-
-	<include file="../../../AIRKinect Extension/assets/build/build.xml" />
 	
 	<!-- Editable Project Properties -->
 	<property name="AIRKinectDemos.OUTPUT_NAME" value="AIRKinectDemos"/>
 
 	<dirname property="AIRKinectDemos.BUILD_ROOT" file="${ant.file.AIRKinect Demos}"/>
 	<property name="AIRKinectDemos.MODULE_ROOT" value="${AIRKinectDemos.BUILD_ROOT}\..\.."/>
-	<property name="AIRKinectDemos.EXTENSION_BIN" value="${AIRKinectDemos.MODULE_ROOT}\..\AIRKinect Extension\bin"/>
 	<property name="AIRKinectDemos.MODULE_SRC_ROOT" value="${AIRKinectDemos.MODULE_ROOT}\src"/>
 	<property name="AIRKinectDemos.ASSETS_ROOT" value="${AIRKinectDemos.MODULE_ROOT}\assets"/>
 	<property name="AIRKinectDemos.EXTERNAL_ASSETS_ROOT" value="${AIRKinectDemos.ASSETS_ROOT}\external"/>
@@ -47,7 +44,7 @@
 	<available file="${AIRKinectDemos.AIR_CERTIFICATE_ROOT}\${AIRKinectDemos.AIR_CERTIFICATE_FILE}" type="file" property="AIRKinectDemos.certificate.present"/>
 	<available file="${AIRKinectDemos.EXTENSION_UNZIPPED_ROOT}\${AIRKinectDemos.EXTENSION_NAME}.ane" type="dir" property="AIRKinectDemos.extension.unzipped.present"/>
 
-	<target name="Clean" if="AIRKinectDemos.bin.present" depends="AIRKinect Extension.Clean">
+	<target name="Clean" if="AIRKinectDemos.bin.present">
 		<delete includeemptydirs="true">
 			<fileset dir="${AIRKinectDemos.BIN_ROOT}" excludes="**/${AIRKinectDemos.SWF_OUTPUT}"/>
 		</delete>
@@ -75,13 +72,7 @@
 		</java>
 	</target>
 
-	<target name="Copy Latest Extension" depends="AIRKinect Extension.Build Native Extension">
-		<copy todir="${AIRKinectDemos.EXTENSION_PATH}">
-			<fileset dir="${AIRKinectDemos.EXTENSION_BIN}" includes="**/*.ane"/>
-		</copy>
-	</target>
-
-	<target name="Extract Native Extension"  depends="Copy Latest Extension, Create BIN">
+	<target name="Extract Native Extension"  depends="Create BIN">
 		<unzip src="${AIRKinectDemos.EXTENSION_PATH}\${AIRKinectDemos.EXTENSION_NAME}.ane" dest="${AIRKinectDemos.EXTENSION_UNZIPPED_ROOT}\${AIRKinectDemos.EXTENSION_NAME}.ane"/>
 	</target>
 
