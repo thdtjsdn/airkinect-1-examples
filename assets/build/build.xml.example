@@ -3,7 +3,7 @@
 	<property file="build.properties"/>
 	<property name="Flex.ADL" value="${FLEX_HOME}\bin\adl.exe"/>
 	<property name="Flex.ADT" value="${FLEX_HOME}\lib\adt.jar"/>
-	
+
 	<!-- Editable Project Properties -->
 	<property name="AIRKinectDemos.OUTPUT_NAME" value="AIRKinectDemos"/>
 
@@ -44,6 +44,7 @@
 	<available file="${AIRKinectDemos.AIR_CERTIFICATE_ROOT}\${AIRKinectDemos.AIR_CERTIFICATE_FILE}" type="file" property="AIRKinectDemos.certificate.present"/>
 	<available file="${AIRKinectDemos.EXTENSION_UNZIPPED_ROOT}\${AIRKinectDemos.EXTENSION_NAME}.ane" type="dir" property="AIRKinectDemos.extension.unzipped.present"/>
 
+	<target name="Clean" if="AIRKinectDemos.bin.present" depends="AIRKinect Extension.Clean">
 	<target name="Clean" if="AIRKinectDemos.bin.present">
 		<delete includeemptydirs="true">
 			<fileset dir="${AIRKinectDemos.BIN_ROOT}" excludes="**/${AIRKinectDemos.SWF_OUTPUT}"/>
