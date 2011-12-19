@@ -4,7 +4,8 @@
  * Date: 10/16/11
  * Time: 5:51 PM
  */
-package com.as3nui.airkinect.demos {
+package com.as3nui.airkinect.demos.pointcloud {
+	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.nativeExtensions.kinect.AIRKinect;
 	import com.as3nui.nativeExtensions.kinect.data.AIRKinectFlags;
 	import com.as3nui.nativeExtensions.kinect.events.CameraFrameEvent;
@@ -23,7 +24,7 @@ package com.as3nui.airkinect.demos {
 	import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
 
-	public class AirKinectCameraDemos extends Sprite {
+	public class PointCloudDemo extends BaseDemo {
 
 		private var _flags:uint;
 
@@ -37,23 +38,26 @@ package com.as3nui.airkinect.demos {
 		private var _matrix:Matrix3D = new Matrix3D();
 		private var _targetZ:Number = 0;
 
-		public function AirKinectCameraDemos() {
+		public function PointCloudDemo() {
 			var perspectiveProjection: PerspectiveProjection = new PerspectiveProjection( );
 			perspectiveProjection.fieldOfView = 60.0;
 			_focalLength = perspectiveProjection.focalLength;
-			this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage)
+			_demoName = "PointCloud Demo";
 		}
 
-		private function onAddedToStage(event:Event):void {
+
+		override protected function onAddedToStage(event:Event):void {
+			super.onAddedToStage(event);
 			initDemo();
-
-			stage.align = StageAlign.TOP_LEFT;
-			stage.scaleMode = StageScaleMode.NO_SCALE;
-
-			stage.addEventListener(Event.RESIZE, onStageResize);
 		}
 
-		private function onStageResize(event:Event):void {
+		override protected function onRemovedFromStage(event:Event):void {
+			super.onRemovedFromStage(event);
+			uninitDemo();
+		}
+
+		override protected function onStageResize(event:Event):void {
+			super.onStageResize(event);
 			root.transform.perspectiveProjection.projectionCenter = new Point(stage.stageWidth / 2, stage.stageHeight / 2);
 
 			if (_depthImage) _depthImage.x = stage.stageWidth - _depthImage.width;
@@ -67,6 +71,31 @@ package com.as3nui.airkinect.demos {
 			_flags = AIRKinectFlags.NUI_INITIALIZE_FLAG_USES_COLOR | AIRKinectFlags.NUI_INITIALIZE_FLAG_USES_DEPTH;
 			initKinect();
 		}
+
+		private function uninitDemo():void {
+			if (_rgbImage) {
+				_rgbImage.bitmapData.dispose();
+				if (this.contains(_rgbImage)) this.removeChild(_rgbImage);
+			}
+			AIRKinect.removeEventListener(CameraFrameEvent.RGB, onRGBFrame);
+
+			if (_depthImage) {
+				_depthImage.bitmapData.dispose();
+				if (this.contains(_depthImage)) this.removeChild(_depthImage);
+			}
+			AIRKinect.removeEventListener(CameraFrameEvent.DEPTH, onDepthFrame);
+			
+			
+			if(_pointCloudImage){
+				_pointCloudImage.bitmapData.dispose();
+			}
+
+			_depthPoints = null;
+
+			this.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+			stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
+		}
+
 
 		private function initKinect():void {
 			if(!AIRKinect.initialize(_flags)){
@@ -90,20 +119,13 @@ package com.as3nui.airkinect.demos {
 			_pointCloudImage = new Bitmap(new BitmapData(AIRKinect.depthSize.x, AIRKinect.depthSize.y, true, 0xffff0000));
 			this.addChild(_pointCloudImage);
 
-			//Listeners
-			NativeApplication.nativeApplication.addEventListener(Event.EXITING, onExiting);
 			onStageResize(null);
-
 			this.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
 		}
 
 		private function onMouseWheel(event:MouseEvent):void {
 			_targetZ -= event.shiftKey ? event.delta *2 : event.delta;
-		}
-
-		private function onExiting(event:Event):void {
-			AIRKinect.shutdown();
 		}
 
 		private function onRGBFrame(e:CameraFrameEvent):void {

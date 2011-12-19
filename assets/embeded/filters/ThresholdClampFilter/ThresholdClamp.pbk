@@ -1,0 +1,42 @@
+<languageVersion : 1.0;>
+
+kernel ThresholdClamp
+<   namespace : "com.as3nui";
+    vendor : "AS3NUI";
+    version : 1;
+>
+{
+    input image4 src;
+    output pixel4 dst;
+    
+    // Threshold
+    parameter float lightThreshold
+    <minValue: 0.0;
+     maxValue: 1.0;
+     defaultValue: 0.7;>;
+     
+    // Threshold
+    parameter float darkThreshold
+    <minValue: 0.0;
+     maxValue: 1.0;
+     defaultValue: 0.3;>;
+    
+    void
+    evaluatePixel()
+    {
+        dst = sampleNearest(src,outCoord());
+        
+        // if color is the key color (or similar)
+        if (  ((dst.r > lightThreshold) &&  (dst.g > lightThreshold) &&  (dst.b > lightThreshold)) ||
+                ((dst.r < darkThreshold) &&  (dst.g < darkThreshold) &&  (dst.b < darkThreshold)))  {
+          // transparent pixel 
+          dst.rgba = float4(1.0, 1.0, 0.0, 0.0);
+        }
+        else {
+         // keep source pixel
+         dst.rgb = dst.rgb;
+         // and source alpha
+         dst.a = dst.a;
+        }
+    }
+}

@@ -4,7 +4,8 @@
  * Date: 10/16/11
  * Time: 5:51 PM
  */
-package com.as3nui.airkinect.demos {
+package com.as3nui.airkinect.demos.mapping {
+	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.nativeExtensions.kinect.AIRKinect;
 	import com.as3nui.nativeExtensions.kinect.data.AIRKinectFlags;
 	import com.as3nui.nativeExtensions.kinect.data.SkeletonFrame;
@@ -16,12 +17,10 @@ package com.as3nui.airkinect.demos {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
-	import flash.display.StageAlign;
-	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.geom.Point;
 
-	public class AirKinectMappingDemo extends Sprite {
+	public class SpaceMappingDemo extends BaseDemo {
 
 		[Embed(source="/../assets/embeded/SantaHat.png")]
 		private var SantaHat:Class;
@@ -35,21 +34,42 @@ package com.as3nui.airkinect.demos {
 		private var _skeletonsSprite:Sprite;
 		private var _depthImage:Bitmap;
 
-
 		private var _santaHat:Sprite;
 		private var _sword:Sprite;
 
-		public function AirKinectMappingDemo() {
-			this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage)
+		public function SpaceMappingDemo() {
+			_demoName = "Space Mapping Demo";
 		}
 
-		private function onAddedToStage(event:Event):void {
+		override protected function onAddedToStage(event:Event):void {
+			super.onAddedToStage(event);
+			initSprites();
 			initDemo();
+		}
 
+
+		override protected function onRemovedFromStage(event:Event):void {
+			super.onRemovedFromStage(event);
+			uninitSprites();
+			uninitDemo();
+		}
+
+		override protected function onStageResize(event:Event):void {
+			super.onStageResize(event);
+			root.transform.perspectiveProjection.projectionCenter = new Point(stage.stageWidth / 2, stage.stageHeight / 2);
+
+			_rgbImage.x = stage.stageWidth / 2 - _rgbImage.width / 2;
+			_rgbImage.y = stage.stageHeight / 2 - _rgbImage.height / 2;
+		}
+
+		//----------------------------------
+		// Sprites
+		//----------------------------------
+		private function initSprites():void {
 			_santaHat = new Sprite();
 			var innerHat:Bitmap = new SantaHat() as Bitmap;
 			innerHat.scaleX = innerHat.scaleY = .70;
-			innerHat.x -= innerHat.width/2;
+			innerHat.x -= innerHat.width / 2;
 			innerHat.y -= innerHat.height * .95;
 			_santaHat.addChild(innerHat);
 			_santaHat.visible = false;
@@ -58,34 +78,60 @@ package com.as3nui.airkinect.demos {
 			_sword = new Sprite();
 			var innerSword:Bitmap = new Sword() as Bitmap;
 			innerSword.scaleX = innerSword.scaleY = 1.5;
-			innerSword.x -= innerSword.width/2;
+			innerSword.x -= innerSword.width / 2;
 			innerSword.y -= innerSword.height * .87;
 			_sword.addChild(innerSword);
 			_sword.visible = false;
 			this.addChild(_sword);
 
-			stage.align = StageAlign.TOP_LEFT;
-			stage.scaleMode = StageScaleMode.NO_SCALE;
-
-			stage.addEventListener(Event.RESIZE, onStageResize);
+			_skeletonsSprite = new Sprite();
+			this.addChild(_skeletonsSprite);
 		}
 
-		private function onStageResize(event:Event):void {
-			root.transform.perspectiveProjection.projectionCenter = new Point(stage.stageWidth / 2, stage.stageHeight / 2);
-
-			_rgbImage.x = stage.stageWidth/2 - _rgbImage.width/2;
-			_rgbImage.y = stage.stageHeight/2 - _rgbImage.height/2;
+		private function uninitSprites():void {
+			if (this.contains(_santaHat)) this.removeChild(_santaHat);
+			if (this.contains(_sword)) this.removeChild(_sword);
+			if(_skeletonsSprite) {
+				while (_skeletonsSprite.numChildren > 0) _skeletonsSprite.removeChildAt(0);
+				if (this.contains(_skeletonsSprite)) this.removeChild(_skeletonsSprite);
+			}
 		}
+
+		//----------------------------------
+		// Demo
+		//----------------------------------
 
 		private function initDemo():void {
 			_flags = AIRKinectFlags.NUI_INITIALIZE_FLAG_USES_SKELETON | AIRKinectFlags.NUI_INITIALIZE_FLAG_USES_DEPTH | AIRKinectFlags.NUI_INITIALIZE_FLAG_USES_COLOR;
 			initKinect();
 		}
 
+		private function uninitDemo():void {
+			if (_rgbImage) {
+				_rgbImage.bitmapData.dispose();
+				if (this.contains(_rgbImage)) this.removeChild(_rgbImage);
+			}
+			AIRKinect.removeEventListener(CameraFrameEvent.RGB, onRGBFrame);
+
+			if (_depthImage) {
+				_depthImage.bitmapData.dispose();
+				if (this.contains(_depthImage)) this.removeChild(_depthImage);
+			}
+			AIRKinect.removeEventListener(CameraFrameEvent.DEPTH, onDepthFrame);
+
+			if (AIRKinect.skeletonEnabled) {
+				if (this.contains(_skeletonsSprite)) this.removeChild(_skeletonsSprite);
+			}
+
+			this.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+			AIRKinect.removeEventListener(SkeletonFrameEvent.UPDATE, onSkeletonFrame);
+		}
+
+
 		private function initKinect():void {
-			if(!AIRKinect.initialize(_flags)){
+			if (!AIRKinect.initialize(_flags)) {
 				trace("Kinect Failed");
-			}else{
+			} else {
 				trace("Kinect Success");
 				onKinectLoaded();
 			}
@@ -100,18 +146,9 @@ package com.as3nui.airkinect.demos {
 			this.addChild(_depthImage);
 			AIRKinect.addEventListener(CameraFrameEvent.DEPTH, onDepthFrame);
 
-			//Listeners
-			NativeApplication.nativeApplication.addEventListener(Event.EXITING, onExiting);
 			onStageResize(null);
-
-			_skeletonsSprite = new Sprite();
-			this.addChild(_skeletonsSprite);
 			this.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			AIRKinect.addEventListener(SkeletonFrameEvent.UPDATE, onSkeletonFrame);
-		}
-
-		private function onExiting(event:Event):void {
-			AIRKinect.shutdown();
 		}
 
 		private function onRGBFrame(e:CameraFrameEvent):void {
@@ -177,17 +214,17 @@ package com.as3nui.airkinect.demos {
 				hatPoint.y += _rgbImage.y;
 				_santaHat.x = hatPoint.x;
 				_santaHat.y = hatPoint.y;
-				_santaHat.scaleX = _santaHat.scaleY =Math.abs(1-((skeleton.getElement(SkeletonPosition.HEAD).z)/4));
+				_santaHat.scaleX = _santaHat.scaleY = Math.abs(1 - ((skeleton.getElement(SkeletonPosition.HEAD).z) / 4));
 
 				var swordPoint:Point = skeleton.getElementInRGBSpace(SkeletonPosition.HAND_RIGHT);
 				var elbowPoint:Point = skeleton.getElementInRGBSpace(SkeletonPosition.ELBOW_RIGHT);
-				var angle:Number = Math.atan2(swordPoint.y - elbowPoint.y,  swordPoint.x - elbowPoint.x);
-				_sword.rotation = angle * (180/Math.PI);
+				var angle:Number = Math.atan2(swordPoint.y - elbowPoint.y, swordPoint.x - elbowPoint.x);
+				_sword.rotation = angle * (180 / Math.PI);
 				swordPoint.x += _rgbImage.x;
 				swordPoint.y += _rgbImage.y;
 				_sword.x = swordPoint.x;
 				_sword.y = swordPoint.y;
-				_sword.scaleX = _sword.scaleY =Math.abs(1-((skeleton.getElement(SkeletonPosition.HAND_RIGHT).z)/4));
+				_sword.scaleX = _sword.scaleY = Math.abs(1 - ((skeleton.getElement(SkeletonPosition.HAND_RIGHT).z) / 4));
 			}
 		}
 	}

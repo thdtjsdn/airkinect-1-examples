@@ -4,44 +4,44 @@
  * Date: 10/16/11
  * Time: 5:51 PM
  */
-package com.as3nui.airkinect.demos {
+package com.as3nui.airkinect.demos.sound {
+	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.nativeExtensions.kinect.AIRKinect;
 	import com.as3nui.nativeExtensions.kinect.data.AIRKinectFlags;
 	import com.as3nui.nativeExtensions.kinect.data.SkeletonPosition;
 	import com.as3nui.nativeExtensions.kinect.events.SkeletonFrameEvent;
 
-	import flash.desktop.NativeApplication;
-	import flash.display.Sprite;
-	import flash.display.StageAlign;
-	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.SampleDataEvent;
 	import flash.geom.Point;
 	import flash.media.Sound;
 
-	public class AirKinectThereminDemo extends Sprite {
+	public class ThereminDemo extends BaseDemo {
 
-		private var _octave:Number    	= 4;
-		private var _amp:Number    		= 0;
-		private var _phase:Number    	= 0;
-		private var _dphase:Number   	= 1 / 44100 * Math.PI * 2;
+		private var _octave:Number = 4;
+		private var _amp:Number = 0;
+		private var _phase:Number = 0;
+		private var _dphase:Number = 1 / 44100 * Math.PI * 2;
 
 		private var _flags:uint;
-		
-		public function AirKinectThereminDemo() {
-			this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage)
+		private var _sound:Sound;
+
+		public function ThereminDemo() {
+			_demoName = "Bad Theremin Demo";
 		}
 
-		private function onAddedToStage(event:Event):void {
+		override protected function onAddedToStage(event:Event):void {
+			super.onAddedToStage(event);
 			initDemo();
-
-			stage.align = StageAlign.TOP_LEFT;
-			stage.scaleMode = StageScaleMode.NO_SCALE;
-
-			stage.addEventListener(Event.RESIZE, onStageResize);
 		}
 
-		private function onStageResize(event:Event):void {
+		override protected function onRemovedFromStage(event:Event):void {
+			super.onRemovedFromStage(event);
+			uninitDemo();
+		}
+
+		override protected function onStageResize(event:Event):void {
+			super.onStageResize(event);
 			root.transform.perspectiveProjection.projectionCenter = new Point(stage.stageWidth / 2, stage.stageHeight / 2);
 		}
 
@@ -51,10 +51,27 @@ package com.as3nui.airkinect.demos {
 			initKinect();
 		}
 
+		private function uninitDemo():void {
+
+			graphics.clear();
+
+			if (_sound) {
+				_sound.removeEventListener(SampleDataEvent.SAMPLE_DATA, onSampleData);
+				try{
+					_sound.close();
+				}catch(err:Error){}
+				_sound = null;
+			}
+
+			AIRKinect.removeEventListener(SkeletonFrameEvent.UPDATE, onSkeletonFrame);
+			this.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+		}
+
+
 		private function initKinect():void {
-			if(!AIRKinect.initialize(_flags)){
+			if (!AIRKinect.initialize(_flags)) {
 				trace("Kinect Failed");
-			}else{
+			} else {
 				trace("Kinect Success");
 				onKinectLoaded();
 			}
@@ -67,38 +84,32 @@ package com.as3nui.airkinect.demos {
 			//Mouse Control
 			//this.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 
-			//Listeners
-			NativeApplication.nativeApplication.addEventListener(Event.EXITING, onExiting);
 			onStageResize(null);
 
-			var sound:Sound = new Sound();
-			sound.addEventListener(SampleDataEvent.SAMPLE_DATA, onSampleData);
-			sound.play();
+			_sound = new Sound();
+			_sound.addEventListener(SampleDataEvent.SAMPLE_DATA, onSampleData);
+			_sound.play();
 		}
 
 		private function onSkeletonFrame(event:SkeletonFrameEvent):void {
-			if(event.skeletonFrame.numSkeletons >0) processHands(event.skeletonFrame.getSkeletonPosition(0))
+			if (event.skeletonFrame.numSkeletons > 0) processHands(event.skeletonFrame.getSkeletonPosition(0))
 		}
 
 		private function processHands(skeletonPosition:SkeletonPosition):void {
 			var leftHeight:Number = skeletonPosition.getElement(SkeletonPosition.HAND_LEFT).y;
 			var rightHeight:Number = skeletonPosition.getElement(SkeletonPosition.HAND_RIGHT).y;
-
 			_octave = leftHeight * 25;
 			_amp = rightHeight;
-
-			//trace(skeletonPosition.getElement(SkeletonPosition.HAND_LEFT));
-			//trace(skeletonPosition.getElement(SkeletonPosition.HAND_RIGHT));
 		}
 
 		private function onSampleData(event:SampleDataEvent):void {
-			 graphics.clear();
-    		graphics.lineStyle(0, 0x999999);
-    		graphics.moveTo(0, stage.stageHeight / 2);
-			
-			var frec:Number    = 220 * Math.pow(2, _octave / 12);
-			for(var i:int = 0; i < 2048; i++) {
-				var sample:Number = 0.5*Math.sin(_phase * frec) * _amp;
+			graphics.clear();
+			graphics.lineStyle(0, 0x999999);
+			graphics.moveTo(0, stage.stageHeight / 2);
+
+			var frec:Number = 220 * Math.pow(2, _octave / 12);
+			for (var i:int = 0; i < 2048; i++) {
+				var sample:Number = 0.5 * Math.sin(_phase * frec) * _amp;
 				_phase += _dphase;
 				event.data.writeFloat(sample); // left
 				event.data.writeFloat(sample); // right
@@ -107,10 +118,6 @@ package com.as3nui.airkinect.demos {
 			}
 		}
 
-		private function onExiting(event:Event):void {
-			AIRKinect.shutdown();
-		}
-		
 		private function onEnterFrame(event:Event):void {
 			_octave = (stage.mouseY / stage.stageHeight) * 25;
 			_amp = stage.mouseX / stage.stage.stageWidth;

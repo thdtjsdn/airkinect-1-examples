@@ -4,26 +4,23 @@
  * Date: 10/16/11
  * Time: 5:51 PM
  */
-package com.as3nui.airkinect.demos {
+package com.as3nui.airkinect.demos.away3d {
 	import away3d.containers.View3D;
 	import away3d.extrusions.Elevation;
 	import away3d.lights.PointLight;
 	import away3d.materials.ColorMaterial;
 
+	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.nativeExtensions.kinect.AIRKinect;
 	import com.as3nui.nativeExtensions.kinect.data.AIRKinectFlags;
 	import com.as3nui.nativeExtensions.kinect.events.CameraFrameEvent;
 
-	import flash.desktop.NativeApplication;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display.Sprite;
-	import flash.display.StageAlign;
-	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.geom.Point;
 
-	public class AirKinectBumpMapDemo extends Sprite {
+	public class ElevationDemo extends BaseDemo {
 
 		private var _flags:uint;
 
@@ -36,20 +33,23 @@ package com.as3nui.airkinect.demos {
 		private var _material:ColorMaterial;
 		private var _rotationSpeed:int = 1;
 
-		public function AirKinectBumpMapDemo() {
-			this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage)
+		public function ElevationDemo() {
+			_demoName = "Elevation Demo";
 		}
 
-		private function onAddedToStage(event:Event):void {
+		override protected function onAddedToStage(event:Event):void {
+			super.onAddedToStage(event);
 			initDemo();
-
-			stage.align = StageAlign.TOP_LEFT;
-			stage.scaleMode = StageScaleMode.NO_SCALE;
-
-			stage.addEventListener(Event.RESIZE, onStageResize);
 		}
 
-		private function onStageResize(event:Event):void {
+		override protected function onRemovedFromStage(event:Event):void {
+			super.onRemovedFromStage(event);
+			unitDemo();
+		}
+
+		override protected function onStageResize(event:Event):void {
+			super.onStageResize(event);
+
 			root.transform.perspectiveProjection.projectionCenter = new Point(stage.stageWidth / 2, stage.stageHeight / 2);
 
 			if (_depthImage) _depthImage.x = stage.stageWidth - _depthImage.width;
@@ -62,6 +62,28 @@ package com.as3nui.airkinect.demos {
 		private function initDemo():void {
 			_flags = AIRKinectFlags.NUI_INITIALIZE_FLAG_USES_COLOR | AIRKinectFlags.NUI_INITIALIZE_FLAG_USES_DEPTH;
 			initKinect();
+		}
+
+		private function unitDemo():void {
+			if(_view) {
+				_view.dispose();
+			}
+
+			_elevation = null;
+			
+			if(_rgbImage){
+				_rgbImage.bitmapData.dispose();
+				if(this.contains(_rgbImage)) this.removeChild(_rgbImage);
+			}
+			AIRKinect.removeEventListener(CameraFrameEvent.RGB, onRGBFrame);
+
+			if(_depthImage){
+				_depthImage.bitmapData.dispose();
+				if(this.contains(_depthImage)) this.removeChild(_depthImage);
+			}
+			AIRKinect.removeEventListener(CameraFrameEvent.DEPTH, onDepthFrame);
+
+			this.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 
 		private function initKinect():void {
@@ -83,16 +105,10 @@ package com.as3nui.airkinect.demos {
 			this.addChild(_depthImage);
 			AIRKinect.addEventListener(CameraFrameEvent.DEPTH, onDepthFrame);
 
-			//Listeners
-			NativeApplication.nativeApplication.addEventListener(Event.EXITING, onExiting);
 			onStageResize(null);
-
 			this.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 
 			init3D();
-		}
-		private function onExiting(event:Event):void {
-			AIRKinect.shutdown();
 		}
 
 		private function onRGBFrame(e:CameraFrameEvent):void {
@@ -144,8 +160,6 @@ package com.as3nui.airkinect.demos {
 					_rotationSpeed *= -1;
 				}
 			}
-
-
 		}
 	}
 }

@@ -1,0 +1,37 @@
+<languageVersion : 1.0;>
+
+kernel DepthMatteFilter
+<   namespace : "com.as3nui";
+    vendor : "AS3NUI";
+    version : 1;
+>
+{
+    input image4 depthSrc;
+    input image4 rgbSrc;
+    output pixel4 dst;
+
+  // Threshold
+    parameter float lightThreshold
+    <minValue: 0.0;
+     maxValue: 1.0;
+     defaultValue: 0.7;>;
+     
+    // Threshold
+    parameter float darkThreshold
+    <minValue: 0.0;
+     maxValue: 1.0;
+     defaultValue: 0.3;>;
+
+    void
+    evaluatePixel()
+    {
+        pixel4 depthPixel = sampleNearest(depthSrc,outCoord());
+        
+        if (  ((depthPixel.r > lightThreshold) &&  (depthPixel.g > lightThreshold) &&  (depthPixel.b > lightThreshold)) ||
+                ((depthPixel.r < darkThreshold) &&  (depthPixel.g < darkThreshold) &&  (depthPixel.b < darkThreshold)))  {
+          dst.rgba = float4(1.0, 1.0, 0.0, 0.0);
+        } else {
+            dst = sampleNearest(rgbSrc,outCoord());
+        }
+    }
+}
