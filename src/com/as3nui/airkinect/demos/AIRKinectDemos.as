@@ -6,6 +6,7 @@
  */
 package com.as3nui.airkinect.demos {
 	import com.as3nui.airkinect.demos.away3d.ElevationDemo;
+	import com.as3nui.airkinect.demos.basic.BasicDemo;
 	import com.as3nui.airkinect.demos.composite.CompositeDemo;
 	import com.as3nui.airkinect.demos.composite.ThresholdDemo;
 	import com.as3nui.airkinect.demos.core.BaseDemo;
@@ -53,6 +54,7 @@ package com.as3nui.airkinect.demos {
 
 				_demos = new <Class>[];
 
+				_demos.push(BasicDemo);
 				_demos.push(ElevationDemo);
 				_demos.push(SpaceMappingDemo);
 				_demos.push(PointCloudDemo);
@@ -84,9 +86,9 @@ package com.as3nui.airkinect.demos {
 			}
 
 			private function loadDemo():void {
-				// Pointcloud Demo
+				this.addChild(new BasicDemo());
 //				this.addChild(new CompositeDemo());
-				this.addChild(new ThresholdDemo());
+//				this.addChild(new ThresholdDemo());
 				//this.addChild(new ElevationDemo());
 				//this.addChild(new SpaceMappingDemo());
 				//this.addChild(new PointCloudDemo());
