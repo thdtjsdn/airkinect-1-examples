@@ -117,9 +117,8 @@ package com.as3nui.airkinect.demos.composite {
 			AIRKinect.addEventListener(CameraFrameEvent.RGB, onRGBFrame);
 
 			_depthImage = new Bitmap(new BitmapData(AIRKinect.depthSize.x, AIRKinect.depthSize.y, true, 0xffff0000));
-			_depthImage.scaleX = -2;
-			_depthImage.scaleY = 2;
-			_depthImage.x = 400 + _depthImage.width;
+			_depthImage.scaleX = _depthImage.scaleY = 2;
+			_depthImage.x = 400;
 			_depthImage.alpha = .75;
 			this.addChild(_depthImage);
 			AIRKinect.addEventListener(CameraFrameEvent.DEPTH, onDepthFrame);

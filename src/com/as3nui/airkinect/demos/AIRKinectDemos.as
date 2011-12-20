@@ -85,8 +85,8 @@ package com.as3nui.airkinect.demos {
 
 			private function loadDemo():void {
 				// Pointcloud Demo
-//				this.addChild(new CompositeDemo());
-				this.addChild(new ThresholdDemo());
+				this.addChild(new CompositeDemo());
+//				this.addChild(new ThresholdDemo());
 				//this.addChild(new ElevationDemo());
 				//this.addChild(new SpaceMappingDemo());
 				//this.addChild(new PointCloudDemo());
