@@ -86,11 +86,11 @@ package com.as3nui.airkinect.demos {
 			}
 
 			private function loadDemo():void {
-				this.addChild(new BasicDemo());
+//				this.addChild(new BasicDemo());
 //				this.addChild(new CompositeDemo());
 //				this.addChild(new ThresholdDemo());
 				//this.addChild(new ElevationDemo());
-				//this.addChild(new SpaceMappingDemo());
+				this.addChild(new SpaceMappingDemo());
 				//this.addChild(new PointCloudDemo());
 				//this.addChild(new ThereminDemo());
 			}

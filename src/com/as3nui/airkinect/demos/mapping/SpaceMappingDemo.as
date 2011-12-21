@@ -13,7 +13,6 @@ package com.as3nui.airkinect.demos.mapping {
 	import com.as3nui.nativeExtensions.kinect.events.CameraFrameEvent;
 	import com.as3nui.nativeExtensions.kinect.events.SkeletonFrameEvent;
 
-	import flash.desktop.NativeApplication;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
@@ -43,8 +42,8 @@ package com.as3nui.airkinect.demos.mapping {
 
 		override protected function onAddedToStage(event:Event):void {
 			super.onAddedToStage(event);
-			initSprites();
 			initDemo();
+			initSprites();
 		}
 
 
@@ -58,8 +57,10 @@ package com.as3nui.airkinect.demos.mapping {
 			super.onStageResize(event);
 			root.transform.perspectiveProjection.projectionCenter = new Point(stage.stageWidth / 2, stage.stageHeight / 2);
 
-			_rgbImage.x = stage.stageWidth / 2 - _rgbImage.width / 2;
-			_rgbImage.y = stage.stageHeight / 2 - _rgbImage.height / 2;
+			if(_rgbImage){
+				_rgbImage.x = stage.stageWidth / 2 - _rgbImage.width / 2;
+				_rgbImage.y = stage.stageHeight / 2 - _rgbImage.height / 2;
+			}
 		}
 
 		//----------------------------------
