@@ -7,7 +7,7 @@
 package com.as3nui.airkinect.demos.pointcloud {
 	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.nativeExtensions.kinect.AIRKinect;
-	import com.as3nui.nativeExtensions.kinect.data.AIRKinectFlags;
+	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectFlags;
 	import com.as3nui.nativeExtensions.kinect.events.CameraFrameEvent;
 
 	import flash.desktop.NativeApplication;

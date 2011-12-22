@@ -6,8 +6,8 @@ kernel DepthMatteFilter
     version : 1;
 >
 {
-    input image4 depthSrc;
     input image4 rgbSrc;
+    input image4 depthSrc;
     output pixel4 dst;
 
   // Threshold
@@ -25,7 +25,11 @@ kernel DepthMatteFilter
     void
     evaluatePixel()
     {
-        pixel4 depthPixel = sampleNearest(depthSrc,outCoord());
+        pixel2 currentDepthCoord = outCoord();
+        currentDepthCoord.x *= .5;
+        currentDepthCoord.y *= .5;
+        currentDepthCoord.x = 320.0 - currentDepthCoord.x;
+        pixel4 depthPixel = sampleNearest(depthSrc,currentDepthCoord);
         
         if (  ((depthPixel.r > lightThreshold) &&  (depthPixel.g > lightThreshold) &&  (depthPixel.b > lightThreshold)) ||
                 ((depthPixel.r < darkThreshold) &&  (depthPixel.g < darkThreshold) &&  (depthPixel.b < darkThreshold)))  {

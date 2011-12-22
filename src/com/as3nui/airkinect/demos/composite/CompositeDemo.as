@@ -7,17 +7,17 @@
 package com.as3nui.airkinect.demos.composite {
 	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.nativeExtensions.kinect.AIRKinect;
-	import com.as3nui.nativeExtensions.kinect.data.AIRKinectFlags;
 	import com.as3nui.nativeExtensions.kinect.events.CameraFrameEvent;
+	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectFlags;
 
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display.BlendMode;
 	import flash.display.Shader;
 	import flash.display.ShaderJob;
 	import flash.events.Event;
-	import flash.events.ShaderEvent;
+	import flash.events.KeyboardEvent;
 	import flash.geom.Point;
+	import flash.ui.Keyboard;
 	import flash.utils.ByteArray;
 
 	import uk.co.soulwire.gui.SimpleGUI;
@@ -48,7 +48,6 @@ package com.as3nui.airkinect.demos.composite {
 			super.onAddedToStage(event);
 			lightThreshold = .7;
 			darkThreshold = .3;
-
 			initDemo();
 		}
 
@@ -107,12 +106,13 @@ package com.as3nui.airkinect.demos.composite {
 
 		private function onKinectLoaded():void {
 			_displayBitmap = new Bitmap(new BitmapData(AIRKinect.rgbSize.x, AIRKinect.rgbSize.y, true, 0xffff0000));
-			_displayBitmap.scaleX =_displayBitmap.scaleY= .5;
+			_displayBitmap.scaleX = _displayBitmap.scaleY= .5;
 			_displayBitmap.y += 100;
 			this.addChild(_displayBitmap);
 
 			_rgbImage = new Bitmap(new BitmapData(AIRKinect.rgbSize.x, AIRKinect.rgbSize.y, true, 0xffff0000));
-			_rgbImage.x += 400;
+			_rgbImage.scaleX = -1;
+			_rgbImage.x += 400 + _rgbImage.width;
 			this.addChild(_rgbImage);
 			AIRKinect.addEventListener(CameraFrameEvent.RGB, onRGBFrame);
 

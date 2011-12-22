@@ -7,9 +7,9 @@
 package com.as3nui.airkinect.demos.mapping {
 	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.nativeExtensions.kinect.AIRKinect;
-	import com.as3nui.nativeExtensions.kinect.data.AIRKinectFlags;
-	import com.as3nui.nativeExtensions.kinect.data.SkeletonFrame;
-	import com.as3nui.nativeExtensions.kinect.data.SkeletonPosition;
+	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectFlags;
+	import com.as3nui.nativeExtensions.kinect.data.AIRKinectSkeletonFrame;
+	import com.as3nui.nativeExtensions.kinect.data.AIRKinectSkeleton;
 	import com.as3nui.nativeExtensions.kinect.events.CameraFrameEvent;
 	import com.as3nui.nativeExtensions.kinect.events.SkeletonFrameEvent;
 
@@ -30,7 +30,7 @@ package com.as3nui.airkinect.demos.mapping {
 
 		private var _flags:uint;
 		private var _rgbImage:Bitmap;
-		private var _currentSkeletons:Vector.<SkeletonPosition>;
+		private var _currentSkeletons:Vector.<AIRKinectSkeleton>;
 		private var _skeletonsSprite:Sprite;
 		private var _depthImage:Bitmap;
 
@@ -161,8 +161,8 @@ package com.as3nui.airkinect.demos.mapping {
 		}
 
 		private function onSkeletonFrame(e:SkeletonFrameEvent):void {
-			_currentSkeletons = new <SkeletonPosition>[];
-			var skeletonFrame:SkeletonFrame = e.skeletonFrame;
+			_currentSkeletons = new <AIRKinectSkeleton>[];
+			var skeletonFrame:AIRKinectSkeletonFrame = e.skeletonFrame;
 
 			_sword.visible = _santaHat.visible = skeletonFrame.numSkeletons > 0;
 			if (skeletonFrame.numSkeletons > 0) {
@@ -176,7 +176,7 @@ package com.as3nui.airkinect.demos.mapping {
 			drawSkeletons();
 		}
 
-		//Loop through all skeletons and all elements and draw them. Each element will be a sprite
+		//Loop through all skeletons and all joints and draw them. Each joint will be a sprite
 		private function drawSkeletons():void {
 			while (_skeletonsSprite.numChildren > 0) _skeletonsSprite.removeChildAt(0);
 			if (!AIRKinect.skeletonEnabled) return;
@@ -185,9 +185,9 @@ package com.as3nui.airkinect.demos.mapping {
 			var depthPoint:Point;
 			var colorSprite:Sprite;
 			var depthSprite:Sprite;
-			for each(var skeleton:SkeletonPosition in _currentSkeletons) {
-				for (var i:uint = 0; i < skeleton.numElements; i++) {
-					colorPoint = skeleton.getElementInRGBSpace(i);
+			for each(var skeleton:AIRKinectSkeleton in _currentSkeletons) {
+				for (var i:uint = 0; i < skeleton.numJoints; i++) {
+					colorPoint = skeleton.getJointInRGBSpace(i);
 					colorPoint.x += _rgbImage.x;
 					colorPoint.y += _rgbImage.y;
 
@@ -198,7 +198,7 @@ package com.as3nui.airkinect.demos.mapping {
 					colorSprite.y = colorPoint.y;
 					_skeletonsSprite.addChild(colorSprite);
 
-					depthPoint = skeleton.getElementInDepthSpace(i);
+					depthPoint = skeleton.getJointInDepthSpace(i);
 					depthPoint.x += _depthImage.x;
 					depthPoint.y += _depthImage.y;
 
@@ -210,22 +210,22 @@ package com.as3nui.airkinect.demos.mapping {
 					_skeletonsSprite.addChild(depthSprite);
 				}
 
-				var hatPoint:Point = skeleton.getElementInRGBSpace(SkeletonPosition.HEAD);
+				var hatPoint:Point = skeleton.getJointInRGBSpace(AIRKinectSkeleton.HEAD);
 				hatPoint.x += _rgbImage.x;
 				hatPoint.y += _rgbImage.y;
 				_santaHat.x = hatPoint.x;
 				_santaHat.y = hatPoint.y;
-				_santaHat.scaleX = _santaHat.scaleY = Math.abs(1 - ((skeleton.getElement(SkeletonPosition.HEAD).z) / 4));
+				_santaHat.scaleX = _santaHat.scaleY = Math.abs(1 - ((skeleton.getJoint(AIRKinectSkeleton.HEAD).z) / 4));
 
-				var swordPoint:Point = skeleton.getElementInRGBSpace(SkeletonPosition.HAND_RIGHT);
-				var elbowPoint:Point = skeleton.getElementInRGBSpace(SkeletonPosition.ELBOW_RIGHT);
+				var swordPoint:Point = skeleton.getJointInRGBSpace(AIRKinectSkeleton.HAND_RIGHT);
+				var elbowPoint:Point = skeleton.getJointInRGBSpace(AIRKinectSkeleton.ELBOW_RIGHT);
 				var angle:Number = Math.atan2(swordPoint.y - elbowPoint.y, swordPoint.x - elbowPoint.x);
 				_sword.rotation = angle * (180 / Math.PI);
 				swordPoint.x += _rgbImage.x;
 				swordPoint.y += _rgbImage.y;
 				_sword.x = swordPoint.x;
 				_sword.y = swordPoint.y;
-				_sword.scaleX = _sword.scaleY = Math.abs(1 - ((skeleton.getElement(SkeletonPosition.HAND_RIGHT).z) / 4));
+				_sword.scaleX = _sword.scaleY = Math.abs(1 - ((skeleton.getJoint(AIRKinectSkeleton.HAND_RIGHT).z) / 4));
 			}
 		}
 	}

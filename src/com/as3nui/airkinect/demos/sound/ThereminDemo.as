@@ -7,8 +7,8 @@
 package com.as3nui.airkinect.demos.sound {
 	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.nativeExtensions.kinect.AIRKinect;
-	import com.as3nui.nativeExtensions.kinect.data.AIRKinectFlags;
-	import com.as3nui.nativeExtensions.kinect.data.SkeletonPosition;
+	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectFlags;
+	import com.as3nui.nativeExtensions.kinect.data.AIRKinectSkeleton;
 	import com.as3nui.nativeExtensions.kinect.events.SkeletonFrameEvent;
 
 	import flash.events.Event;
@@ -95,9 +95,9 @@ package com.as3nui.airkinect.demos.sound {
 			if (event.skeletonFrame.numSkeletons > 0) processHands(event.skeletonFrame.getSkeletonPosition(0))
 		}
 
-		private function processHands(skeletonPosition:SkeletonPosition):void {
-			var leftHeight:Number = skeletonPosition.getElement(SkeletonPosition.HAND_LEFT).y;
-			var rightHeight:Number = skeletonPosition.getElement(SkeletonPosition.HAND_RIGHT).y;
+		private function processHands(skeletonPosition:AIRKinectSkeleton):void {
+			var leftHeight:Number = skeletonPosition.getJoint(AIRKinectSkeleton.HAND_LEFT).y;
+			var rightHeight:Number = skeletonPosition.getJoint(AIRKinectSkeleton.HAND_RIGHT).y;
 			_octave = leftHeight * 25;
 			_amp = rightHeight;
 		}

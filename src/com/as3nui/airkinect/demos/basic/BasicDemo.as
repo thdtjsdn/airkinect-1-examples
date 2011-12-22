@@ -7,10 +7,11 @@
 package com.as3nui.airkinect.demos.basic {
 	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.nativeExtensions.kinect.AIRKinect;
-	import com.as3nui.nativeExtensions.kinect.data.AIRKinectCameraResolutions;
-	import com.as3nui.nativeExtensions.kinect.data.AIRKinectFlags;
-	import com.as3nui.nativeExtensions.kinect.data.SkeletonFrame;
-	import com.as3nui.nativeExtensions.kinect.data.SkeletonPosition;
+	import com.as3nui.nativeExtensions.kinect.data.AIRKinectSkeletonJoint;
+	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectCameraResolutions;
+	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectFlags;
+	import com.as3nui.nativeExtensions.kinect.data.AIRKinectSkeletonFrame;
+	import com.as3nui.nativeExtensions.kinect.data.AIRKinectSkeleton;
 	import com.as3nui.nativeExtensions.kinect.events.CameraFrameEvent;
 	import com.as3nui.nativeExtensions.kinect.events.DeviceStatusEvent;
 	import com.as3nui.nativeExtensions.kinect.events.SkeletonFrameEvent;
@@ -28,7 +29,7 @@ package com.as3nui.airkinect.demos.basic {
 		public static const KinectMaxDepthInFlash:uint = 200;
 
 		private var _flags:uint;
-		private var _currentSkeletons:Vector.<SkeletonPosition>;
+		private var _currentSkeletons:Vector.<AIRKinectSkeleton>;
 
 		private var _skeletonsSprite:Sprite;
 
@@ -179,8 +180,8 @@ package com.as3nui.airkinect.demos.basic {
 
 		//Store Skeleton
 		private function onSkeletonFrame(e:SkeletonFrameEvent):void {
-			_currentSkeletons = new <SkeletonPosition>[];
-			var skeletonFrame:SkeletonFrame = e.skeletonFrame;
+			_currentSkeletons = new <AIRKinectSkeleton>[];
+			var skeletonFrame:AIRKinectSkeletonFrame = e.skeletonFrame;
 
 			if (skeletonFrame.numSkeletons > 0) {
 				for (var j:uint = 0; j < skeletonFrame.numSkeletons; j++) {
@@ -194,28 +195,28 @@ package com.as3nui.airkinect.demos.basic {
 			drawSkeletons();
 		}
 
-		//Loop through all skeletons and all elements and draw them. Each element will be a sprite
+		//Loop through all skeletons and all joints and draw them. Each joint will be a sprite
 		private function drawSkeletons():void {
 			while (_skeletonsSprite.numChildren > 0) _skeletonsSprite.removeChildAt(0);
 			if (!AIRKinect.skeletonEnabled) return;
 
-			var element:Vector3D;
+			var joint:AIRKinectSkeletonJoint;
 			var scaler:Vector3D = new Vector3D(stage.stageWidth, stage.stageHeight, KinectMaxDepthInFlash);
-			var elementSprite:Sprite;
+			var jointSprite:Sprite;
 
 			var color:uint;
-			for each(var skeleton:SkeletonPosition in _currentSkeletons) {
-				for (var i:uint = 0; i < skeleton.numElements; i++) {
-					element = skeleton.getElementScaled(i, scaler);
+			for each(var skeleton:AIRKinectSkeleton in _currentSkeletons) {
+				for (var i:uint = 0; i < skeleton.numJoints; i++) {
+					joint = skeleton.getJointScaled(i, scaler);
 
-					elementSprite = new Sprite();
-					color = (element.z / (KinectMaxDepthInFlash * 4)) * 255 << 16 | (1 - (element.z / (KinectMaxDepthInFlash * 4))) * 255 << 8 | 0;
-					elementSprite.graphics.beginFill(color);
-					elementSprite.graphics.drawCircle(0, 0, 15);
-					elementSprite.x = element.x;
-					elementSprite.y = element.y;
-					elementSprite.z = element.z;
-					_skeletonsSprite.addChild(elementSprite);
+					jointSprite = new Sprite();
+					color = (joint.z / (KinectMaxDepthInFlash * 4)) * 255 << 16 | (1 - (joint.z / (KinectMaxDepthInFlash * 4))) * 255 << 8 | 0;
+					jointSprite.graphics.beginFill(color);
+					jointSprite.graphics.drawCircle(0, 0, 15);
+					jointSprite.x = joint.x;
+					jointSprite.y = joint.y;
+					jointSprite.z = joint.z;
+					_skeletonsSprite.addChild(jointSprite);
 				}
 			}
 		}
