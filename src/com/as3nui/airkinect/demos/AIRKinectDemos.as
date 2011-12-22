@@ -24,7 +24,7 @@ package com.as3nui.airkinect.demos {
 	import flash.ui.Keyboard;
 
 	public class AIRKinectDemos extends Sprite {
-			private var _devMode:Boolean = true;
+			private var _devMode:Boolean = false;
 			private var _currentDemoIndex:int;
 
 			private var _demos:Vector.<Class>;

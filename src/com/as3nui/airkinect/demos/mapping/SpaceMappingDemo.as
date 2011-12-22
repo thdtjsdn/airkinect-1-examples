@@ -43,8 +43,9 @@ package com.as3nui.airkinect.demos.mapping {
 
 		override protected function onAddedToStage(event:Event):void {
 			super.onAddedToStage(event);
-			initSprites();
 			initDemo();
+			initSprites();
+
 		}
 
 
