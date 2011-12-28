@@ -11,6 +11,7 @@ package com.as3nui.airkinect.demos {
 	import com.as3nui.airkinect.demos.composite.ThresholdDemo;
 	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.airkinect.demos.mapping.SpaceMappingDemo;
+	import com.as3nui.airkinect.demos.mask.MaskDemo;
 	import com.as3nui.airkinect.demos.pointcloud.PointCloudDemo;
 	import com.as3nui.airkinect.demos.sound.ThereminDemo;
 
@@ -58,6 +59,7 @@ package com.as3nui.airkinect.demos {
 				_demos.push(ElevationDemo);
 				_demos.push(SpaceMappingDemo);
 				_demos.push(PointCloudDemo);
+				_demos.push(MaskDemo);
 				_demos.push(ThereminDemo);
 
 				stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp)
