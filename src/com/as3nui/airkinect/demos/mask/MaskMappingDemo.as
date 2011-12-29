@@ -1,30 +1,38 @@
 package com.as3nui.airkinect.demos.mask {
 	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.nativeExtensions.kinect.AIRKinect;
+	import com.as3nui.nativeExtensions.kinect.data.AIRKinectSkeleton;
+	import com.as3nui.nativeExtensions.kinect.data.AIRKinectSkeletonFrame;
 	import com.as3nui.nativeExtensions.kinect.events.CameraFrameEvent;
 	import com.as3nui.nativeExtensions.kinect.events.DeviceStatusEvent;
+	import com.as3nui.nativeExtensions.kinect.events.SkeletonFrameEvent;
+	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectFlags;
 	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectFlags;
 
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.geom.Point;
 	import flash.ui.Keyboard;
 
-	public class MaskDemo extends BaseDemo {
+	public class MaskMappingDemo extends BaseDemo {
 
 		private var _flags:uint;
 		private var _rgbImage:Bitmap;
 		private var _depthImage:Bitmap;
 		private var _playerMaskImage:Bitmap;
+		private var _currentSkeletons:Vector.<AIRKinectSkeleton>;
+		private var _skeletonsSprite:Sprite;
 
-		public function MaskDemo() {
+		public function MaskMappingDemo() {
 			super();
 		}
 
 		override protected function onAddedToStage(event:Event):void {
 			super.onAddedToStage(event);
+
 			initDemo();
 		}
 
@@ -46,7 +54,7 @@ package com.as3nui.airkinect.demos.mask {
 
 		private function initDemo():void {
 			_demoName = "Mask Demo";
-			_flags = AIRKinectFlags.NUI_INITIALIZE_FLAG_USES_COLOR | AIRKinectFlags.NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX;
+			_flags = AIRKinectFlags.NUI_INITIALIZE_FLAG_USES_SKELETON | AIRKinectFlags.NUI_INITIALIZE_FLAG_USES_COLOR | AIRKinectFlags.NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX;
 			initKinect();
 		}
 
@@ -61,8 +69,12 @@ package com.as3nui.airkinect.demos.mask {
 			AIRKinect.removeEventListener(DeviceStatusEvent.DISCONNECTED, onKinectDisconnected);
 			AIRKinect.removeEventListener(DeviceStatusEvent.RECONNECTED, onKinectConnected);
 
+			this.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+			AIRKinect.removeEventListener(SkeletonFrameEvent.UPDATE, onSkeletonFrame);
+
 			//Listeners
 			stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+			if(_skeletonsSprite) if(this.contains(_skeletonsSprite)) this.removeChild(_skeletonsSprite);
 		}
 
 		private function initKinect():void {
@@ -98,6 +110,8 @@ package com.as3nui.airkinect.demos.mask {
 
 				this.addChild(_playerMaskImage);
 				AIRKinect.addEventListener(CameraFrameEvent.PLAYER_MASK, onPlayerMask);
+
+				AIRKinect.addEventListener(SkeletonFrameEvent.UPDATE, onSkeletonFrame);
 			}
 
 			//Disconnect/Reconnect Listeners
@@ -107,6 +121,11 @@ package com.as3nui.airkinect.demos.mask {
 			//Listeners
 			stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 			onStageResize(null);
+
+			this.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+
+			_skeletonsSprite = new Sprite();
+			this.addChild(_skeletonsSprite);
 		}
 
 		//----------------------------------
@@ -141,6 +160,43 @@ package com.as3nui.airkinect.demos.mask {
 			}
 		}
 
+		private function onSkeletonFrame(e:SkeletonFrameEvent):void {
+			_currentSkeletons = new <AIRKinectSkeleton>[];
+			var skeletonFrame:AIRKinectSkeletonFrame = e.skeletonFrame;
+
+			if (skeletonFrame.numSkeletons > 0) {
+				for (var j:uint = 0; j < skeletonFrame.numSkeletons; j++) {
+					_currentSkeletons.push(skeletonFrame.getSkeletonPosition(j));
+				}
+			}
+		}
+
+		private function onEnterFrame(event:Event):void {
+			while (_skeletonsSprite.numChildren > 0) _skeletonsSprite.removeChildAt(0);
+			if (!AIRKinect.skeletonEnabled) return;
+
+			var playerMaskPoint:Point;
+			var playMaskSprite:Sprite;
+			for each(var skeleton:AIRKinectSkeleton in _currentSkeletons) {
+				for (var i:uint = 0; i < skeleton.numJoints; i++) {
+					playerMaskPoint = skeleton.getJointInDepthSpace(i);
+					playerMaskPoint.x = 320 - playerMaskPoint.x;
+					playerMaskPoint.x *= _playerMaskImage.scaleX;
+					playerMaskPoint.y *= _playerMaskImage.scaleY;
+
+					playerMaskPoint.x += _playerMaskImage.x;
+					playerMaskPoint.y += _playerMaskImage.y;
+
+					playMaskSprite = new Sprite();
+					playMaskSprite.graphics.beginFill(0x00ff00);
+					playMaskSprite.graphics.drawCircle(0, 0, 5);
+					playMaskSprite.x = playerMaskPoint.x;
+					playMaskSprite.y = playerMaskPoint.y;
+					_skeletonsSprite.addChild(playMaskSprite);
+				}
+			}
+		}
+
 		//show RGB Image
 		private function onRGBFrame(e:CameraFrameEvent):void {
 			_rgbImage.bitmapData = e.frame;
@@ -155,6 +211,5 @@ package com.as3nui.airkinect.demos.mask {
 		private function onDepthFrame(e:CameraFrameEvent):void {
 			_depthImage.bitmapData = e.frame;
 		}
-
 	}
 }

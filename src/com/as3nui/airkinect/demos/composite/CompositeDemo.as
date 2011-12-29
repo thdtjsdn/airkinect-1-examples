@@ -15,9 +15,7 @@ package com.as3nui.airkinect.demos.composite {
 	import flash.display.Shader;
 	import flash.display.ShaderJob;
 	import flash.events.Event;
-	import flash.events.KeyboardEvent;
 	import flash.geom.Point;
-	import flash.ui.Keyboard;
 	import flash.utils.ByteArray;
 
 	import uk.co.soulwire.gui.SimpleGUI;

@@ -12,14 +12,13 @@ package com.as3nui.airkinect.demos.mask {
 	import flash.geom.Point;
 	import flash.ui.Keyboard;
 
-	public class MaskDemo extends BaseDemo {
+	public class CorrectionProblemDemo extends BaseDemo {
 
 		private var _flags:uint;
 		private var _rgbImage:Bitmap;
-		private var _depthImage:Bitmap;
 		private var _playerMaskImage:Bitmap;
 
-		public function MaskDemo() {
+		public function CorrectionProblemDemo() {
 			super();
 		}
 
@@ -36,12 +35,15 @@ package com.as3nui.airkinect.demos.mask {
 		override protected function onStageResize(event:Event):void {
 			super.onStageResize(event);
 			root.transform.perspectiveProjection.projectionCenter = new Point(stage.stageWidth / 2, stage.stageHeight / 2);
+			if (_rgbImage) {
+				_rgbImage.x = (stage.stageWidth - _rgbImage.width) * .5;
+				_rgbImage.y = (stage.stageHeight - _rgbImage.height) * .5;
+			}
+
 			if (_playerMaskImage) {
 				_playerMaskImage.x = (stage.stageWidth - _playerMaskImage.width) * .5;
 				_playerMaskImage.y = (stage.stageHeight - _playerMaskImage.height) * .5;
 			}
-
-			if (_depthImage) _depthImage.x = stage.stageWidth - _depthImage.width;
 		}
 
 		private function initDemo():void {
@@ -69,7 +71,7 @@ package com.as3nui.airkinect.demos.mask {
 			if (!AIRKinect.initialize(_flags)) {
 				trace("Kinect Failed");
 			} else {
-				//Turn on the Player Mask Image
+
 				AIRKinect.playerMaskEnabled = true;
 				trace("Kinect Success");
 				onKinectLoaded();
@@ -80,22 +82,15 @@ package com.as3nui.airkinect.demos.mask {
 			//RGB Camera Setup
 			if (AIRKinect.rgbEnabled) {
 				_rgbImage = new Bitmap(new BitmapData(AIRKinect.rgbSize.x, AIRKinect.rgbSize.y, true, 0xffff0000));
-				_rgbImage.scaleX = _rgbImage.scaleY = .25;
 				this.addChild(_rgbImage);
 				AIRKinect.addEventListener(CameraFrameEvent.RGB, onRGBFrame);
 			}
 
 			//Depth Camera Setup
 			if (AIRKinect.depthEnabled) {
-				_depthImage = new Bitmap(new BitmapData(AIRKinect.depthSize.x, AIRKinect.depthSize.y, true, 0xffff0000));
-				_depthImage.scaleX = _depthImage.scaleY = .5;
-				this.addChild(_depthImage);
-				AIRKinect.addEventListener(CameraFrameEvent.DEPTH, onDepthFrame);
-
-				//Player Mask Image
 				_playerMaskImage = new Bitmap(new BitmapData(AIRKinect.depthSize.x, AIRKinect.depthSize.y, true, 0xffff0000));
 				_playerMaskImage.scaleX = _playerMaskImage.scaleY = 2;
-
+				_playerMaskImage.alpha = .75;
 				this.addChild(_playerMaskImage);
 				AIRKinect.addEventListener(CameraFrameEvent.PLAYER_MASK, onPlayerMask);
 			}
@@ -146,14 +141,9 @@ package com.as3nui.airkinect.demos.mask {
 			_rgbImage.bitmapData = e.frame;
 		}
 
-		//Show Player Mask Image
+		//Show Depth Image
 		private function onPlayerMask(e:CameraFrameEvent):void {
 			_playerMaskImage.bitmapData = e.frame;
-		}
-
-		//Show Depth Image
-		private function onDepthFrame(e:CameraFrameEvent):void {
-			_depthImage.bitmapData = e.frame;
 		}
 
 	}
