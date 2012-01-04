@@ -7,16 +7,14 @@
 package com.as3nui.airkinect.demos.composite {
 	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.nativeExtensions.kinect.AIRKinect;
-	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectFlags;
 	import com.as3nui.nativeExtensions.kinect.events.CameraFrameEvent;
+	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectFlags;
 
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Shader;
-
 	import flash.events.Event;
 	import flash.filters.ShaderFilter;
-	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.utils.ByteArray;
 

@@ -167,7 +167,7 @@ package com.as3nui.airkinect.demos.mapping {
 			_sword.visible = _santaHat.visible = skeletonFrame.numSkeletons > 0;
 			if (skeletonFrame.numSkeletons > 0) {
 				for (var j:uint = 0; j < skeletonFrame.numSkeletons; j++) {
-					_currentSkeletons.push(skeletonFrame.getSkeletonPosition(j));
+					_currentSkeletons.push(skeletonFrame.getSkeleton(j));
 				}
 			}
 		}

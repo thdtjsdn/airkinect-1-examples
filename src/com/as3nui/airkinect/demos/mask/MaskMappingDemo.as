@@ -166,7 +166,7 @@ package com.as3nui.airkinect.demos.mask {
 
 			if (skeletonFrame.numSkeletons > 0) {
 				for (var j:uint = 0; j < skeletonFrame.numSkeletons; j++) {
-					_currentSkeletons.push(skeletonFrame.getSkeletonPosition(j));
+					_currentSkeletons.push(skeletonFrame.getSkeleton(j));
 				}
 			}
 		}

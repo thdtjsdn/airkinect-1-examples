@@ -7,11 +7,8 @@
 package com.as3nui.airkinect.demos {
 	import com.as3nui.airkinect.demos.away3d.ElevationDemo;
 	import com.as3nui.airkinect.demos.basic.BasicDemo;
-	import com.as3nui.airkinect.demos.composite.CompositeDemo;
-	import com.as3nui.airkinect.demos.composite.ThresholdDemo;
 	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.airkinect.demos.mapping.SpaceMappingDemo;
-	import com.as3nui.airkinect.demos.mask.CorrectionProblemDemo;
 	import com.as3nui.airkinect.demos.mask.MaskDemo;
 	import com.as3nui.airkinect.demos.mask.MaskMappingDemo;
 	import com.as3nui.airkinect.demos.pointcloud.PointCloudDemo;
@@ -27,7 +24,7 @@ package com.as3nui.airkinect.demos {
 	import flash.ui.Keyboard;
 
 	public class AIRKinectDemos extends Sprite {
-			private var _devMode:Boolean = true;
+			private var _devMode:Boolean = false;
 			private var _currentDemoIndex:int;
 
 			private var _demos:Vector.<Class>;
@@ -61,7 +58,6 @@ package com.as3nui.airkinect.demos {
 				_demos.push(ElevationDemo);
 				_demos.push(SpaceMappingDemo);
 				_demos.push(PointCloudDemo);
-				_demos.push(MaskDemo);
 				_demos.push(ThereminDemo);
 				_demos.push(MaskDemo);
 				_demos.push(MaskMappingDemo);
@@ -97,11 +93,11 @@ package com.as3nui.airkinect.demos {
 //				this.addChild(new ThresholdDemo());
 				//this.addChild(new ElevationDemo());
 //				this.addChild(new SpaceMappingDemo());
-				//this.addChild(new PointCloudDemo());
+//				this.addChild(new PointCloudDemo());
 				//this.addChild(new ThereminDemo());
 //				this.addChild(new MaskDemo());
 //				this.addChild(new MaskMappingDemo());
-				this.addChild(new CorrectionProblemDemo());
+//				this.addChild(new CorrectionProblemDemo());
 			}
 
 			private function loadNextDemo():void {

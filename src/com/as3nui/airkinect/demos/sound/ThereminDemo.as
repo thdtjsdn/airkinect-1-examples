@@ -92,12 +92,12 @@ package com.as3nui.airkinect.demos.sound {
 		}
 
 		private function onSkeletonFrame(event:SkeletonFrameEvent):void {
-			if (event.skeletonFrame.numSkeletons > 0) processHands(event.skeletonFrame.getSkeletonPosition(0))
+			if (event.skeletonFrame.numSkeletons > 0) processHands(event.skeletonFrame.getSkeleton(0))
 		}
 
-		private function processHands(skeletonPosition:AIRKinectSkeleton):void {
-			var leftHeight:Number = skeletonPosition.getJoint(AIRKinectSkeleton.HAND_LEFT).y;
-			var rightHeight:Number = skeletonPosition.getJoint(AIRKinectSkeleton.HAND_RIGHT).y;
+		private function processHands(skeleton:AIRKinectSkeleton):void {
+			var leftHeight:Number = skeleton.getJoint(AIRKinectSkeleton.HAND_LEFT).y;
+			var rightHeight:Number = skeleton.getJoint(AIRKinectSkeleton.HAND_RIGHT).y;
 			_octave = leftHeight * 25;
 			_amp = rightHeight;
 		}
