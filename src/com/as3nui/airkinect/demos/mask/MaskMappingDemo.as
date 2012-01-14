@@ -12,8 +12,7 @@ package com.as3nui.airkinect.demos.mask {
 	import com.as3nui.nativeExtensions.kinect.events.CameraFrameEvent;
 	import com.as3nui.nativeExtensions.kinect.events.SkeletonFrameEvent;
 	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectFlags;
-	
-	import flash.desktop.NativeApplication;
+
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
@@ -21,8 +20,6 @@ package com.as3nui.airkinect.demos.mask {
 	import flash.geom.Point;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
-
-	import mx.core.IFactory;
 
 	public class MaskMappingDemo extends BaseDemo {
 		
@@ -198,14 +195,7 @@ package com.as3nui.airkinect.demos.mask {
 			var colorSprite:Sprite;
 			for each(var skeleton:AIRKinectSkeleton in _currentSkeletons) {
 				for (var i:uint = 0; i < skeleton.numJoints; i++) {
-					if(AIRKinect.isOSX()){
-						colorPoint = skeleton.getJointInRGBSpace(i);
-					}else{
-						colorPoint = skeleton.getJointInDepthSpace(i);
-						colorPoint.x = 320 - colorPoint.x;
-						colorPoint.x *= 2;
-						colorPoint.y *= 2;
-					}
+					colorPoint = skeleton.getJointInPlayerMaskSpace(i);
 					colorPoint.x += _playerMaskImage.x;
 					colorPoint.y += _playerMaskImage.y;
 					
@@ -217,38 +207,15 @@ package com.as3nui.airkinect.demos.mask {
 					_skeletonsSprite.addChild(colorSprite);
 				}
 				
-				var hatPoint:Point;
-				if(AIRKinect.isOSX()){
-					hatPoint = skeleton.getJointInRGBSpace(AIRKinectSkeleton.HEAD);
-				}else{
-					hatPoint = skeleton.getJointInDepthSpace(AIRKinectSkeleton.HEAD);
-					hatPoint.x = 320 - hatPoint.x;
-					hatPoint.x *= 2;
-					hatPoint.y *= 2;
-				}
-				
+				var hatPoint:Point = skeleton.getJointInPlayerMaskSpace(AIRKinectSkeleton.HEAD);
 				hatPoint.x += _playerMaskImage.x;
 				hatPoint.y += _playerMaskImage.y;
 				_santaHat.x = hatPoint.x;
 				_santaHat.y = hatPoint.y;
 				_santaHat.scaleX = _santaHat.scaleY = Math.abs(1 - ((skeleton.getJoint(AIRKinectSkeleton.HEAD).z) / 4));
 				
-				var swordPoint:Point;
-				var elbowPoint:Point;
-				if(AIRKinect.isOSX()){
-					swordPoint = skeleton.getJointInRGBSpace(AIRKinectSkeleton.HAND_RIGHT);
-					elbowPoint = skeleton.getJointInRGBSpace(AIRKinectSkeleton.ELBOW_RIGHT);
-				}else{
-					swordPoint = skeleton.getJointInDepthSpace(AIRKinectSkeleton.HAND_RIGHT);
-					swordPoint.x = 320 - swordPoint.x;
-					swordPoint.x *= 2;
-					swordPoint.y *= 2;
-
-					elbowPoint = skeleton.getJointInDepthSpace(AIRKinectSkeleton.ELBOW_RIGHT);
-					elbowPoint.x = 320 - elbowPoint.x;
-					elbowPoint.x *= 2;
-					elbowPoint.y *= 2;
-				}
+				var swordPoint:Point = skeleton.getJointInPlayerMaskSpace(AIRKinectSkeleton.HAND_RIGHT);
+				var elbowPoint:Point = skeleton.getJointInPlayerMaskSpace(AIRKinectSkeleton.ELBOW_RIGHT);
 				
 				var angle:Number = Math.atan2(swordPoint.y - elbowPoint.y, swordPoint.x - elbowPoint.x);
 				_sword.rotation = angle * (180 / Math.PI);
