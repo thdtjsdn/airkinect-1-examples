@@ -22,13 +22,12 @@
 package com.as3nui.airkinect.demos.mapping {
 	import com.as3nui.airkinect.demos.core.BaseDemo;
 	import com.as3nui.nativeExtensions.kinect.AIRKinect;
-	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectFlags;
-	import com.as3nui.nativeExtensions.kinect.data.AIRKinectSkeletonFrame;
 	import com.as3nui.nativeExtensions.kinect.data.AIRKinectSkeleton;
+	import com.as3nui.nativeExtensions.kinect.data.AIRKinectSkeletonFrame;
 	import com.as3nui.nativeExtensions.kinect.events.CameraFrameEvent;
 	import com.as3nui.nativeExtensions.kinect.events.SkeletonFrameEvent;
+	import com.as3nui.nativeExtensions.kinect.settings.AIRKinectFlags;
 
-	import flash.desktop.NativeApplication;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
